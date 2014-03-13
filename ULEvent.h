@@ -25,15 +25,6 @@ typedef enum kEMeetupPrivacy
     MEETUP_PRIVATE  = 1
 } EMeetupPrivacy;
 
-typedef enum kEImportedType
-{
-    IMPORTED_NOT        = 0,
-    IMPORTED_FACEBOOK   = 1,
-    IMPORTED_EVENTBRITE = 2,
-    IMPORTED_MEETUP     = 3,
-    IMPORTED_SONGKICK   = 4
-} EImportedType;
-
 @class Person;
 
 @interface ULEvent : ULGeoObject <EKEventEditViewDelegate, UIAlertViewDelegate>
@@ -53,6 +44,7 @@ typedef enum kEImportedType
     NSNumber    *_maxGuests;
     NSString    *_strImageURL;
     NSString    *_strOriginalURL;
+    NSString    *_strNotes;
     
     NSString    *_venueString;
     NSString    *_venueId;
@@ -66,22 +58,40 @@ typedef enum kEImportedType
     NSUInteger  _importedType;
     
     Boolean     _canceled;
+    
+    NSString *_featureString;
 }
 
 // Editable properties (upon creation)
+/*@property (nonatomic, readonly) EMeetupType     meetupType;
+@property (nonatomic, readonly) EMeetupPrivacy  privacy;
+@property (nonatomic, readonly) NSString*       strOwnerId;
+@property (nonatomic, readonly) NSString*       strOwnerName;
+@property (nonatomic, readonly) NSString*       strSubject;
+@property (nonatomic, readonly) NSString*       strDescription;
+@property (nonatomic, readonly) NSDate*         dateTime;
+@property (nonatomic, readonly) NSUInteger      durationSeconds;
+@property (nonatomic, readonly) NSUInteger      iconNumber;
+@property (nonatomic, readonly) NSString*       strPrice;
+@property (nonatomic, readonly) NSNumber*       maxGuests;
+@property (nonatomic, readonly) NSString*       strImageURL;
+@property (nonatomic, readonly) NSString*       strOriginalURL;*/
+
 @property (nonatomic, assign)   EMeetupType     meetupType;
 @property (nonatomic, assign)   EMeetupPrivacy  privacy;
-@property (nonatomic, copy)     NSString*   strOwnerId;
-@property (nonatomic, copy)     NSString*   strOwnerName;
-@property (nonatomic, copy)     NSString*   strSubject;
-@property (nonatomic, copy)     NSString*   strDescription;
-@property (nonatomic, copy)     NSDate*     dateTime;
+@property (nonatomic, retain)   NSString*   strOwnerId;
+@property (nonatomic, retain)   NSString*   strOwnerName;
+@property (nonatomic, retain)   NSString*   strSubject;
+@property (nonatomic, retain)   NSString*   strDescription;
+@property (nonatomic, retain)   NSDate*     dateTime;
+@property (nonatomic, retain)   NSDate*     dateTimeExp;
 @property (nonatomic, assign)   NSUInteger  durationSeconds;
 @property (nonatomic, assign)   NSUInteger  iconNumber;
-@property (nonatomic, copy)     NSString*   strPrice;
-@property (nonatomic, copy)     NSNumber*   maxGuests;
-@property (nonatomic, copy)     NSString*   strImageURL;
-@property (nonatomic, copy)     NSString*   strOriginalURL;
+@property (nonatomic, retain)   NSString*   strPrice;
+@property (nonatomic, retain)   NSNumber*   maxGuests;
+@property (nonatomic, retain)   NSString*   strImageURL;
+@property (nonatomic, retain)   NSString*   strOriginalURL;
+@property (nonatomic, retain)   NSString*   strNotes;
 
 // Venue data
 @property (nonatomic, readonly) NSString *venueString;
@@ -99,6 +109,9 @@ typedef enum kEImportedType
 
 // Canceled or not
 @property (nonatomic, readonly, getter=isCanceled) Boolean canceled;
+
+// Featured
+@property (nonatomic, readonly) NSString *featureString;
 
 // Initialization
 -(id) init;
@@ -123,5 +136,7 @@ typedef enum kEImportedType
 -(Boolean)isPersonNearby:(Person*)person;
 
 -(void)incrementCommentsCount;
+
+-(Boolean) feature:(NSString*)feature;
 
 @end

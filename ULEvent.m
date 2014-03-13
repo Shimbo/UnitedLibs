@@ -16,7 +16,7 @@
 
 @implementation ULEvent
 
-@synthesize strOwnerId=_strOwnerId, strOwnerName=_strOwnerName, strSubject=_strSubject, strDescription=_strDescription, dateTime=_dateTime, privacy=_privacy, meetupType=_meetupType, venueString=_venueString, venueId=_venueId, venueAddress=_venueAddress, commentsCount=_commentsCount, attendees=_attendees, decliners=_decliners, durationSeconds=_durationSeconds, importedEvent=_importedEvent, importedType=_importedType, iconNumber=_iconNumber, strPrice=_strPrice, strImageURL=_strImageURL, strOriginalURL=_strOriginalURL, maxGuests=_maxGuests, canceled=_canceled;
+/*@synthesize strOwnerId=_strOwnerId, strOwnerName=_strOwnerName, strSubject=_strSubject, strDescription=_strDescription, dateTime=_dateTime, privacy=_privacy, meetupType=_meetupType, venueString=_venueString, venueId=_venueId, venueAddress=_venueAddress, commentsCount=_commentsCount, attendees=_attendees, decliners=_decliners, durationSeconds=_durationSeconds, importedEvent=_importedEvent, importedType=_importedType, iconNumber=_iconNumber, strPrice=_strPrice, strImageURL=_strImageURL, strOriginalURL=_strOriginalURL, maxGuests=_maxGuests, canceled=_canceled;*/
 
 -(id) init
 {
@@ -216,6 +216,8 @@
 
 -(Boolean)hasAttendee:(NSString*)str
 {
+    if ( ! _attendees )
+        return FALSE;
     if ( [_attendees indexOfObject:str] == NSNotFound )
         return FALSE;
     return TRUE;
@@ -224,7 +226,7 @@
 -(void)addAttendee:(NSString*)str
 {
     if ( ! _attendees )
-        _attendees = [[NSMutableArray alloc] initWithObjects:self.strId, nil];
+        _attendees = [[NSMutableArray alloc] initWithObjects:str, nil];
     else
     {
         [_attendees removeObjectIdenticalTo:str];
@@ -274,6 +276,12 @@
 -(void)incrementCommentsCount
 {
     _commentsCount++;
+}
+
+- (Boolean) feature:(NSString*)feature
+{
+    _featureString = feature;
+    return TRUE;
 }
 
 @end

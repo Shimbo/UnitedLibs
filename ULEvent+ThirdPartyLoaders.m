@@ -294,4 +294,139 @@
     return self;
 }
 
+-(id) initWithSongkickEvent:(NSDictionary*)data
+{
+    self = [self init];
+    
+    _importedEvent = TRUE;
+    _importedType = IMPORTED_SONGKICK;
+    _meetupType = TYPE_MEETUP;
+    _privacy = MEETUP_PUBLIC;
+    
+    _strId = [ [NSString alloc] initWithFormat:@"skmt_%@", [data objectForKey:@"id"]];
+    _strOwnerId = strCurrentUserId;
+    
+    // Subdictionaries
+    NSDictionary* venue = [data objectForKey:@"venue"];
+    NSDictionary* start = [data objectForKey:@"start"];
+    NSDictionary* location = [data objectForKey:@"location"];
+    
+    // Subject
+    if ( [data objectForKey:@"displayName"] )
+        _strDescription = [data objectForKey:@"displayName"];
+    
+    // Date and time
+    NSString* stringDateTime = [start objectForKey:@"datetime"];
+    if ( ! stringDateTime || ! [stringDateTime isKindOfClass:[NSString class]] )
+    {
+        stringDateTime = [start objectForKey:@"date"];
+        if ( ! stringDateTime )
+            return nil;
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+        _dateTime = [dateFormatter dateFromString:stringDateTime];
+        _dateTime = [_dateTime dateByAddingTimeInterval:19*3600];
+        _strNotes = @"Approximate time!";
+    }
+    else
+    {
+        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZ"];
+        _dateTime = [dateFormatter dateFromString:stringDateTime];
+    }
+    _durationSeconds = 3600;
+    _dateTimeExp = [_dateTime dateByAddingTimeInterval:_durationSeconds];
+    
+    // Performers (for subject and description)
+    NSArray* performance = [data objectForKey:@"performance"];
+    NSMutableString* strLineup = [NSMutableString stringWithString:@""];
+    NSMutableString* strAdditionalDescription = [NSMutableString stringWithString:@""];
+    NSString* firstHeadline;
+    for ( NSDictionary* perf in performance )
+    {
+        NSDictionary* artist = [perf objectForKey:@"artist"];
+        if ( strLineup.length != 0 )
+            [strLineup appendString:@", "];
+        NSString* artistName = [artist objectForKey:@"displayName"];
+        [strLineup appendString:artistName];
+        
+        // Artist name
+        NSString* billing = [perf objectForKey:@"billing"];
+        if ( ! billing )
+            billing = @"";
+        BOOL headline = [billing isEqualToString:@"headline"];
+        if ( ! firstHeadline && headline )
+            firstHeadline = artistName;
+        if ( ! _strOwnerName )  // In case there won't be any headliner
+            _strOwnerName = artistName;
+        
+        if ( strAdditionalDescription.length == 0 )
+            [strAdditionalDescription appendString:@"<BR><BR><b>Lineup:</b><BR>"];
+        if ( headline )
+            [strAdditionalDescription appendFormat:@"%@ (headline)<BR>", artistName];
+        else
+            [strAdditionalDescription appendFormat:@"%@<BR>", artistName];
+    }
+    if ( firstHeadline )
+        _strOwnerName = firstHeadline;
+    
+    // Subject and description
+    _strSubject = strLineup;
+    if ( strLineup.length == 0 )
+        _strSubject = [data objectForKey:@"displayName"];
+    
+    if ( strAdditionalDescription.length > 0 )
+        _strDescription = [_strDescription stringByAppendingString:strAdditionalDescription];
+    
+    // If owner not found
+    if ( _strOwnerName.length == 0 )
+        _strOwnerName = @"Unknown performers";
+    
+    // Popularity
+    //NSString* popularityString = [data objectForKey:@"popularity"];
+    //_strOwnerName = [NSString stringWithFormat:@"%@ - %@", popularityString, _strOwnerName];
+    
+    // Location
+    NSString* strLat = [location objectForKey:@"lat"];
+    NSString* strLon = [location objectForKey:@"lng"];
+    if ( ! strLat || ! strLon )
+        return nil;
+    double lat = [strLat doubleValue];
+    double lon = [strLon doubleValue];
+    _location = [PFGeoPoint geoPointWithLatitude:lat longitude:lon];
+    
+    // Venue
+    _venueString = [venue objectForKey:@"displayName"];
+    if ( ! _venueString || ! [_venueString isKindOfClass:[NSString class]] )
+        _venueString = [NSString stringWithFormat:@"%f : %f", lat, lon];
+    if ( [location objectForKey:@"city"] )
+        _venueAddress = [location objectForKey:@"city"];
+    _venueId = [venue objectForKey:@"id"];
+    
+    // Icon
+    _iconNumber = 2;
+    
+    // Url and prices
+    _strOriginalURL = [data objectForKey:@"uri"];
+    _strPrice = @"Visit Songkick";
+    
+    return self;
+}
+
++(NSUInteger) eventImportedTypeById:(NSString*)eventId
+{
+    if ( eventId )
+        if ( [eventId rangeOfString:@"skmt"].length > 0 )
+            return IMPORTED_SONGKICK;
+    return IMPORTED_NOT;
+}
+
++(NSString*) eventPlatformIdFromId:(NSString*)eventId
+{
+    if ( [self eventImportedTypeById:eventId] != IMPORTED_NOT )
+        return [eventId substringFromIndex:5];
+    else
+        return eventId;
+}
+
 @end

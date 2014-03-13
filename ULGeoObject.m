@@ -7,7 +7,7 @@
 //
 
 #import "ULGeoObject.h"
-#import "LocationManager.h"
+#import "ULLocationManager.h"
 
 @implementation ULGeoObject
 
