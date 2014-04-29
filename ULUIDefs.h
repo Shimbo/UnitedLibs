@@ -34,6 +34,8 @@ CG_INLINE float vectorDistance(CGPoint p1,CGPoint p2) {
 
 @end
 
+@interface ULTransitView : UIView
+@end
 
 @interface UIColor (HexColor)
 
@@ -56,12 +58,13 @@ CG_INLINE float vectorDistance(CGPoint p1,CGPoint p2) {
 @end
 
 @interface UIView (Localize)
--(void)localize;
+- (void)localize;
+- (void)scaleFonts;
+- (void)scalePositions;
 @end
 
-
-@interface UILabel (Copy) <NSCopying>
-
+@interface SKProduct (priceAsString)
+@property (nonatomic, readonly) NSString *priceAsString;
 @end
 
 @interface UINavigationController (Transition)

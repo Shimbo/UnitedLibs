@@ -22,6 +22,23 @@
 
 @end
 
+@implementation ULTransitView
+
+-(BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
+    for ( UIView* view in self.subviews )
+    {
+        if ( [view isKindOfClass:[ULTransitView class]] )
+            if ( CGRectContainsPoint(view.frame, point) )
+                return [view pointInside:CGPointMake(point.x-view.originX, point.y-view.originY) withEvent:event];
+        if ( [view isKindOfClass:[UIButton class]] )
+            if ( CGRectContainsPoint(view.frame, point) )
+                return YES;
+    }
+    return NO;
+}
+
+@end
+
 @implementation UIColor (HexColor)
 
 + (UIColor *)colorWithHexString:(NSString *)hexString {
@@ -151,6 +168,57 @@
                 [button setTitle:NSLocalizedString(button.titleLabel.text, nil) forState:UIControlStateNormal];
         }
     }];
+}
+
+- (void)scaleFonts
+{
+    [self.subviews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop)
+    {
+        if ( view.tag != 777 )
+        {
+            if ([view isKindOfClass:[UILabel class]]) {
+                UILabel *label = (UILabel*)view;
+                UNI_UPDATE_FONT(label);
+            }
+            else if ([view isKindOfClass:[UITextView class]]) {
+                UITextView *text = (UITextView*)view;
+                UNI_UPDATE_FONT(text);
+            }
+            else if ([view isKindOfClass:[UIButton class]]) {
+                UIButton *button = (UIButton*)view;
+                UNI_UPDATE_FONT(button.titleLabel);
+            }
+            else
+                [view scaleFonts];
+        }
+    }];
+}
+
+- (void)scalePositions
+{
+    [self.subviews enumerateObjectsUsingBlock:^(UIView *view, NSUInteger idx, BOOL *stop)
+    {
+        if ( view.tag != 777 )
+        {
+            [view scalePositions];
+            UNI_SHIFT_IPAD(view.frame, REPOSITION_TOPLEFT);
+        }
+    }];
+}
+
+@end
+
+@implementation SKProduct (priceAsString)
+
+- (NSString *) priceAsString
+{
+    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
+    [formatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
+    [formatter setNumberStyle:NSNumberFormatterCurrencyStyle];
+    [formatter setLocale:[self priceLocale]];
+    
+    NSString *str = [formatter stringFromNumber:[self price]];
+    return str;
 }
 
 @end
