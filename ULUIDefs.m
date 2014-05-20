@@ -162,6 +162,11 @@
             if ( label.text.length > 0 )
                 [label setText:NSLocalizedString(label.text, nil)];
         }
+        if ([view isKindOfClass:[UITextView class]]) {
+            UITextView *text = (UITextView*)view;
+            if ( text.text.length > 0 )
+                [text setText:NSLocalizedString(text.text, nil)];
+        }
         if ([view isKindOfClass:[UIButton class]]) {
             UIButton *button = (UIButton*)view;
             if ( button.titleLabel.text.length > 0 )
@@ -204,21 +209,6 @@
             UNI_SHIFT_IPAD(view.frame, REPOSITION_TOPLEFT);
         }
     }];
-}
-
-@end
-
-@implementation SKProduct (priceAsString)
-
-- (NSString *) priceAsString
-{
-    NSNumberFormatter *formatter = [[NSNumberFormatter alloc] init];
-    [formatter setFormatterBehavior:NSNumberFormatterBehavior10_4];
-    [formatter setNumberStyle:NSNumberFormatterCurrencyStyle];
-    [formatter setLocale:[self priceLocale]];
-    
-    NSString *str = [formatter stringFromNumber:[self price]];
-    return str;
 }
 
 @end

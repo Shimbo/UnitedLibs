@@ -24,7 +24,7 @@ static NSString* const kLocationUpdated = @"kLocationUpdated";
     PFGeoPoint          *geoPointOld;
 }
 
-+ (id)sharedInstance;
++ (LocationManager*)sharedInstance;
 
 @property (nonatomic, retain) CLLocationManager* locationManager;
 

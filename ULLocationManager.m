@@ -43,6 +43,7 @@ static NSUInteger fireLocationEnabledNotification = 0;
 
 -(void)startUpdating
 {
+    geoPointOld = nil;
     [locationManager startUpdatingLocation];
 }
 

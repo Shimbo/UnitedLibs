@@ -63,10 +63,6 @@ CG_INLINE float vectorDistance(CGPoint p1,CGPoint p2) {
 - (void)scalePositions;
 @end
 
-@interface SKProduct (priceAsString)
-@property (nonatomic, readonly) NSString *priceAsString;
-@end
-
 @interface UINavigationController (Transition)
 
 - (UIViewController*) replaceViewController:(UIViewController*)controller;
